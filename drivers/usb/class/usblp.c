@@ -1113,7 +1113,7 @@ static int usblp_probe(struct usb_interface *intf,
 	struct usblp *usblp;
 	int protocol;
 	int retval;
-       printk(KERN_ALERT "USB PRINTER: usblp_probe...\n";
+       printk(KERN_ALERT "USB PRINTER: usblp_probe...\n");
 
 	/* Malloc and start initializing usblp structure so we can use it
 	 * directly. */
@@ -1408,7 +1408,7 @@ static void usblp_disconnect(struct usb_interface *intf)
 
 	if (!usblp->used)
 		usblp_cleanup(usblp);
-       printk(KERN_ALERT "USB PRINTER: usblp_disconnect...\n")
+       printk(KERN_ALERT "USB PRINTER: usblp_disconnect...\n");
 	mutex_unlock(&usblp_mutex);
 }
 
