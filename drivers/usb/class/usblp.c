@@ -266,6 +266,8 @@ static int usblp_ctrl_msg(struct usblp *usblp, int request, int type, int dir, i
 {
 	int retval;
 	int index = usblp->ifnum;
+        
+       printk(KERN_INFO "USB PRINTER: usblp_ctrl_msg...\n", usblp->minor);
 
 	/* High byte has the interface index.
 	   Low byte has the alternate setting.
@@ -322,7 +324,7 @@ static void usblp_bulk_read(struct urb *urb)
 	usblp->rcomplete = 1;
 	wake_up(&usblp->rwait);
 	spin_unlock(&usblp->lock);
-
+       printk(KERN_ALERT "USB PRINTER: usblp_bulk_read...\n");
 	usb_free_urb(urb);
 }
 
@@ -346,7 +348,7 @@ static void usblp_bulk_write(struct urb *urb)
 	usblp->wcomplete = 1;
 	wake_up(&usblp->wwait);
 	spin_unlock(&usblp->lock);
-
+       printk(KERN_ALERT "USB PRINTER: usblp_bulk_write...\n");
 	usb_free_urb(urb);
 }
 
@@ -383,7 +385,7 @@ static int usblp_check_status(struct usblp *usblp, int err)
 		printk(KERN_INFO "usblp%d: %s\n",
 		   usblp->minor, usblp_messages[newerr]);
 	}
-
+       printk(KERN_ALERT "usblp%d: USB PRINTER: usblp_check_status...\n");
 	return newerr;
 }
 
@@ -448,17 +450,20 @@ static int usblp_open(struct inode *inode, struct file *file)
 	}
 out:
 	mutex_unlock(&usblp_mutex);
+       printk("USB PRINTER: usblp_open...\n");
 	return retval;
 }
 
 static void usblp_cleanup(struct usblp *usblp)
 {
 	printk(KERN_INFO "usblp%d: removed\n", usblp->minor);
+	printk(KERN_ALERT "usblp%d: removed BY FISHLEGS\n", usblp->minor);
 
 	kfree(usblp->readbuf);
 	kfree(usblp->device_id_string);
 	kfree(usblp->statusbuf);
 	kfree(usblp);
+       printk(KERN_ALERT "USB PRINTER: usblp_cleanup...\n";
 }
 
 static void usblp_unlink_urbs(struct usblp *usblp)
@@ -480,6 +485,7 @@ static int usblp_release(struct inode *inode, struct file *file)
 	} else		/* finish cleanup from disconnect */
 		usblp_cleanup(usblp);
 	mutex_unlock(&usblp_mutex);
+       printk(KERN_ALERT "usblp%d: USB PRINTER: usblp_release...\n", usblp->minor);
 	return 0;
 }
 
@@ -497,6 +503,7 @@ static unsigned int usblp_poll(struct file *file, struct poll_table_struct *wait
 	ret = ((usblp->bidir && usblp->rcomplete) ? POLLIN  | POLLRDNORM : 0) |
 	   ((usblp->no_paper || usblp->wcomplete) ? POLLOUT | POLLWRNORM : 0);
 	spin_unlock_irqrestore(&usblp->lock, flags);
+       printk(KERN_ALERT "USB PRINTER: usblp_poll...\n", usblp->minor);
 	return ret;
 }
 
@@ -697,6 +704,7 @@ static long usblp_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 done:
 	mutex_unlock(&usblp->mut);
+       printk(KERN_ALERT "USB PRINTER: usblp_ioctl...\n");
 	return retval;
 }
 
@@ -803,6 +811,7 @@ static ssize_t usblp_write(struct file *file, const char __user *buffer, size_t 
 	}
 
 	mutex_unlock(&usblp->wmut);
+       printk(KERN_ALERT "USB PRINTER: usblp_write...\n");
 	return writecount;
 
 raise_submit:
@@ -862,6 +871,7 @@ static ssize_t usblp_read(struct file *file, char __user *buffer, size_t len, lo
 
 done:
 	mutex_unlock(&usblp->mut);
+       printk(KERN_ALERT "USB PRINTER: usblp_read...\n");
 	return count;
 }
 
@@ -1018,7 +1028,7 @@ static int usblp_submit_read(struct usblp *usblp)
 		spin_unlock_irqrestore(&usblp->lock, flags);
 		goto raise_submit;
 	}
-
+       printk(KERN_INFO "USB PRINTER: usblp_submit_read...\n");
 	return 0;
 
 raise_submit:
@@ -1054,6 +1064,7 @@ static unsigned int usblp_quirks(__u16 vendor, __u16 product)
 		    product == quirk_printers[i].productId)
 			return quirk_printers[i].quirks;
 	}
+       printk(KERN_ALERT "USB PRINTER: usblp_quirks...\n");
 	return 0;
 }
 
@@ -1102,6 +1113,7 @@ static int usblp_probe(struct usb_interface *intf,
 	struct usblp *usblp;
 	int protocol;
 	int retval;
+       printk(KERN_ALERT "USB PRINTER: usblp_probe...\n";
 
 	/* Malloc and start initializing usblp structure so we can use it
 	 * directly. */
@@ -1396,6 +1408,7 @@ static void usblp_disconnect(struct usb_interface *intf)
 
 	if (!usblp->used)
 		usblp_cleanup(usblp);
+       printk(KERN_ALERT "USB PRINTER: usblp_disconnect...\n")
 	mutex_unlock(&usblp_mutex);
 }
 

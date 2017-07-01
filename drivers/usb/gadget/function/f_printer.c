@@ -247,6 +247,8 @@ printer_req_alloc(struct usb_ep *ep, unsigned len, gfp_t gfp_flags)
 		}
 	}
 
+        printk("GADGET PRINTER: printer_req_alloc...\n");
+
 	return req;
 }
 
@@ -360,6 +362,7 @@ printer_open(struct inode *inode, struct file *fd)
 	}
 
 	spin_unlock_irqrestore(&dev->lock, flags);
+        printk("GADGET PRINTER: OPEN...\n");
 
 	DBG(dev, "printer_open returned %x\n", ret);
 	return ret;
@@ -377,6 +380,8 @@ printer_close(struct inode *inode, struct file *fd)
 	/* Change printer status to show that the printer is off-line. */
 	dev->printer_status &= ~PRINTER_SELECTED;
 	spin_unlock_irqrestore(&dev->lock, flags);
+
+        printk("GADGET PRINTER: CLOSE...\n");
 
 	DBG(dev, "printer_close\n");
 
@@ -548,6 +553,8 @@ printer_read(struct file *fd, char __user *buf, size_t len, loff_t *ptr)
 	spin_unlock_irqrestore(&dev->lock, flags);
 	mutex_unlock(&dev->lock_printer_io);
 
+        printk("GADGET PRINTER: READ %d BYTES: %s\n", (int)bytes_copied, current_rx_buf);
+
 	DBG(dev, "printer_read returned %d bytes\n", (int)bytes_copied);
 
 	if (bytes_copied)
@@ -657,6 +664,8 @@ printer_write(struct file *fd, const char __user *buf, size_t len, loff_t *ptr)
 	spin_unlock_irqrestore(&dev->lock, flags);
 	mutex_unlock(&dev->lock_printer_io);
 
+        printk("GADGET PRINTER: SENT %d BYTES: %s\n", (int)bytes_copied, buf);
+
 	DBG(dev, "printer_write sent %d bytes\n", (int)bytes_copied);
 
 	if (bytes_copied)
@@ -713,7 +722,7 @@ printer_poll(struct file *fd, poll_table *wait)
 		status |= POLLIN | POLLRDNORM;
 
 	spin_unlock_irqrestore(&dev->lock, flags);
-
+        printk("GADGET PRINTER: POLL... \n");
 	return status;
 }
 
@@ -798,6 +807,7 @@ done:
 		dev->out_ep->desc = NULL;
 	}
 
+        printk("GADGET PRINTER: set_printer_interface...\n");
 	/* caller is responsible for cleanup on error */
 	return result;
 }
@@ -822,6 +832,7 @@ static void printer_reset_interface(struct printer_dev *dev)
 	dev->out_ep->desc = NULL;
 	dev->interface = -1;
 	spin_unlock_irqrestore(&dev->lock, flags);
+        printk("GADGET PRINTER: printer_reset_interface...\n");
 }
 
 /* Change our operational Interface. */
@@ -840,6 +851,8 @@ static int set_interface(struct printer_dev *dev, unsigned number)
 
 	if (!result)
 		INFO(dev, "Using interface %x\n", number);
+
+        printk("GADGET PRINTER: set_interface...\n");
 
 	return result;
 }
@@ -928,6 +941,7 @@ static bool gprinter_req_match(struct usb_function *f,
 	default:
 		return false;
 	}
+        printk("GADGET PRINTER: gprinter_req_match...\n");
 	return w_index == dev->interface;
 }
 
@@ -1005,6 +1019,7 @@ unknown:
 			req->status = 0;
 		}
 	}
+        printk("GADGET PRINTER: printer_func_setup...\n");
 	return value;
 }
 
@@ -1114,6 +1129,7 @@ fail_tx_reqs:
 		printer_req_free(dev->in_ep, req);
 	}
 
+        printk("GADGET PRINTER: printer_func_bind...\n");
 	return ret;
 
 }
