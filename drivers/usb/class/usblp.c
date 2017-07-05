@@ -1114,6 +1114,7 @@ static int usblp_probe(struct usb_interface *intf,
 	int protocol;
 	int retval;
         
+
         printk(KERN_ALERT "USB PRINTER: usblp_probe...\n";
 
 	/* Malloc and start initializing usblp structure so we can use it
