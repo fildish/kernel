@@ -463,7 +463,7 @@ static void usblp_cleanup(struct usblp *usblp)
 	kfree(usblp->device_id_string);
 	kfree(usblp->statusbuf);
 	kfree(usblp);
-       printk(KERN_ALERT "USB PRINTER: usblp_cleanup...\n";
+       printk(KERN_ALERT "USB PRINTER: usblp_cleanup...\n");
 }
 
 static void usblp_unlink_urbs(struct usblp *usblp)
